@@ -1,0 +1,15 @@
+body {
+    padding: 0px;
+}
+
+.user {
+    gap: 5px;
+}
+
+.nav {
+    justify-content: center;
+}
+
+.image {
+    height: 200px;
+}

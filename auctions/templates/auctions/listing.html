@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% load humanize %}
+
+{% block title %}Categories{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>{{ listing.title }}</h1>
+            <p>{{ listing.description }}</p>
+            <p><span style="font-weight: bold">Starting Bid: </span>{{ listing.starting_bid | intcomma }}</p>
+        </div>
+        <div class="col">
+            <img src="{{ listing.image.url }}" alt="image">
+        </div>
+    </div>
+</div>
+{% endblock %}
