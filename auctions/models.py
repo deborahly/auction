@@ -19,7 +19,7 @@ class Listing(models.Model):
         ("BROOCH", "Brooch")
     )
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default="")
-    image = models.ImageField(upload_to="media/images/", null=True, blank=True)    
+    image = models.ImageField(upload_to="images/", null=True, blank=True)    
 
     def __str__(self):
         return f"{self.title}"

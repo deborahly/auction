@@ -2,20 +2,30 @@
 
 {% load humanize %}
 
-{% block title %}Categories{% endblock %}
+{% block title %}Listing{% endblock %}
 
 {% block body %}
+    <div class="container">
+        <div class="row listing-row-1">
+            <div class="col-8">
+                <h1>{{ listing.title }}</h1>
+            </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h1>{{ listing.title }}</h1>
-            <p>{{ listing.description }}</p>
-            <p><span style="font-weight: bold">Starting Bid: </span>{{ listing.starting_bid | intcomma }}</p>
+            <div class="col-4 col-price">
+                <p><span style="font-weight: bold">Current Price: </span><span style="font-size: 25px">{{ listing.starting_bid | intcomma }}</span></p>
+            </div>
         </div>
-        <div class="col">
-            <img src="{{ listing.image.url }}" alt="image">
+
+        <div class="row listing-row-2">
+            <div class="col-8">
+                <p>{{ listing.description }}</p>
+            </div>
+
+            <div class="col-4 col-price">
+                <p><span style="font-weight: bold">Starting Bid: </span>{{ listing.starting_bid | intcomma }}</p>
+            </div>
         </div>
+
+        <img class="image" id="listing-img" src="{{ listing.image.url }}" alt="image">
     </div>
-</div>
 {% endblock %}

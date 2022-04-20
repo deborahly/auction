@@ -2,14 +2,111 @@ body {
     padding: 0px;
 }
 
-.user {
-    gap: 5px;
-}
-
 .nav {
     justify-content: center;
 }
 
-.image {
-    height: 200px;
+p, h1, h2, h3, h4, h5 {
+    padding: 0;
+    margin: 0;
 }
+
+/* Layout */
+.layout-row-title {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
+.layout-row-subtitle {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
+.layout-row-user {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
+.user {
+    gap: 5px;
+    text-align: right;
+}
+
+/* Index  */
+.index-row-title {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.index-row-item-title {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    align-items: center;
+    border-top: 1px solid gray;
+}
+
+.index-row-content {
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid gray;
+}
+
+.col-img {
+    align-items: center;
+}
+
+#index-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.col-txt {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    text-align: center;
+}
+
+.col-int {
+    align-self: center;
+}
+
+.description {
+    text-align: left;
+}
+
+/* Listing */
+.listing-row-1 {
+    align-items: end;
+}
+
+.listing-row-2 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    align-items: end;
+}
+
+.col-price {
+    text-align: right;
+}
+
+#listing-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 30rem;
+    width: auto;
+}
+
+/* Helper classes */
