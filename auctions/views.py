@@ -1,3 +1,6 @@
+from ast import operator
+from operator import methodcaller
+# from turtle import title
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -5,8 +8,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 
-from .models import User, Listing
-from .forms import ListingForm
+from .models import User, Listing, Watched, Bid, Comment, Auction
+from .forms import ListingForm, BidForm
+
+import operator
 
 
 def index(request):
@@ -72,7 +77,20 @@ def categories(request):
 
 # NEW VIEW
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    if request.method == "POST":
+        form = request.POST
+        title = Listing.objects.get(title=form["listing"])
+        w = Watched(user=request.user, title=title)
+        w.save()
+
+        return render(request, "auctions/watchlist.html", {
+            "watched": Watched.objects.filter(user=request.user)
+        })
+    
+    else:
+        return render(request, "auctions/watchlist.html", {
+            "watched": Watched.objects.filter(user=request.user)
+        })
 
 # NEW VIEW
 def create_listing(request):
@@ -80,15 +98,8 @@ def create_listing(request):
         form = ListingForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            # title = form.cleaned_data["title"]
-            # description = form.cleaned_data["description"]
-            # starting_bid = form.cleaned_data["starting_bid"]
-            # category = form.cleaned_data["category"]
             return HttpResponseRedirect(reverse("index"))
-        #     return HttpResponseRedirect(reverse("listing", args=(title,)))
-        # else:
-        #     return HttpResponseRedirect(reverse("create_listing"))
-
+            
     else:
         form = ListingForm
         return render(request, "auctions/create.html", {
@@ -96,8 +107,61 @@ def create_listing(request):
         })
 
 # NEW VIEW
-def listing(request, id):
-    listing = Listing.objects.get(id=id)
-    return render(request, "auctions/listing.html", {
-        "listing": Listing.objects.get(id=id),
-    })
+def listing(request, title):
+    listing = Listing.objects.get(title=title)
+    listing_id = listing.id
+    comments = Comment.objects.filter(title=listing_id)
+    auction = Auction.objects.get(title=listing_id)
+
+    # FORMS
+    bid_form = BidForm(initial={"title": listing_id})
+    
+    try:
+        watched = Watched.objects.get(user=request.user, title=listing_id)
+               
+    except:
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "comments": comments,
+            "auction": auction,
+            "bid_form": bid_form
+        })
+    
+    else:    
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "comments": comments,
+            "auction": auction,
+            "watched": watched,
+            "bid_form": bid_form
+        })
+
+# NEW VIEW
+def bids(request):
+    if request.method == "POST":
+        form = request.POST
+        title = form["title"]
+
+        listing = Listing.objects.get(title=title)
+        listing_id = listing.id
+        
+        bid_form = BidForm(request.POST)
+        
+        if bid_form.is_valid():
+            new_bid = bid_form.cleaned_data["bid"]
+        
+        bids = Bid.objects.filter(title=listing_id)
+        last_bid = Bid.objects.all().last().bid
+        
+        if new_bid > last_bid:
+            user = User.objects.get(username=request.user)
+            b = Bid(bid=new_bid, title=listing, user=user)
+            b.save()
+            return HttpResponseRedirect(reverse("listing", args=(title,)))
+    
+        else:
+            return HttpResponseRedirect(reverse("error"))
+
+# NEW VIEW
+def error(request):
+    pass

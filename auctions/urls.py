@@ -12,7 +12,8 @@ urlpatterns = [
     path("categories", views.categories,name="categories"),
     path("watchlist", views.watchlist, name="watchlist"),
     path("listing/create", views.create_listing, name="create_listing"),
-    path("listing/<str:id>", views.listing, name="listing")
-    # static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("listing/<str:title>", views.listing, name="listing"),
+    path("bids", views.bids, name="bids"),
+    path("error", views.error, name="error")
 ]
 

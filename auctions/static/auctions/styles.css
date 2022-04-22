@@ -1,9 +1,8 @@
 body {
-    padding: 0px;
-}
-
-.nav {
-    justify-content: center;
+    padding-top: 1rem;
+    padding-bottom: 3rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
 }
 
 p, h1, h2, h3, h4, h5 {
@@ -36,6 +35,10 @@ p, h1, h2, h3, h4, h5 {
 .user {
     gap: 5px;
     text-align: right;
+}
+
+.nav {
+    justify-content: center;
 }
 
 /* Index  */
@@ -97,6 +100,12 @@ p, h1, h2, h3, h4, h5 {
     align-items: end;
 }
 
+.listing-row-3 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    align-items: end;
+}
+
 .col-price {
     text-align: right;
 }
@@ -107,6 +116,28 @@ p, h1, h2, h3, h4, h5 {
     margin-right: auto;
     height: 30rem;
     width: auto;
+}
+
+.listing-row-comment-title {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid gray;
+}
+
+.listing-row-comment {
+    border-bottom: 1px solid gray;
+}
+
+.comment-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.comment-user {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: small;
+    text-align: end;
 }
 
 /* Helper classes */

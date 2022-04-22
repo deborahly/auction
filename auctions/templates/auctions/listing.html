@@ -26,6 +26,61 @@
             </div>
         </div>
 
+        <div class="row listing-row-3">
+            <div class="col">
+                {% if user.is_authenticated %}
+                    {% if not watched %}
+                        <form action="{% url 'watchlist' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing" value="{{ listing.title }}">
+                            <button type="submit" class="btn btn-secondary">Add to Watchlist</button>
+                        </form>
+                    {% else %}
+                        <p>WATCHING</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="col col-price">
+                {% if user.is_authenticated %}
+                    {% if auction.user != user and auction.status == "ACTIVE" %}
+                        <form action="{% url 'bids' %}" method="post">
+                            {% csrf_token %}
+
+                            {{ bid_form.as_p }}
+
+                            <input type="hidden" name="title" value="{{ listing.title }}">
+                            <button type="submit" class="btn btn-secondary">Make Offer</button>
+                        </form>
+                    {% elif auction.user == user and auction.status == "ACTIVE" %}
+                        <form action="{% url 'listing' listing.title %}" method="post">
+                            <button type="submit" class="btn btn-secondary">Close auction</button>
+                        </form>
+                    {% elif auction.user != user and auction.status == "SOLD" and auction.winner == request.user %}
+                        <p>Auction closed - You won this auction</p>
+                    {% else %}
+                        <p>Auction closed</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
         <img class="image" id="listing-img" src="{{ listing.image.url }}" alt="image">
+
+        <section>
+            <div class="row listing-row-comment-title">
+                <div class="col">
+                    <h3>Comments</h3>
+                </div>
+            </div>
+            {% for comment in comments %}
+                <div class="row listing-row-comment">
+                    <div class="col">
+                        <p class="comment-content">{{ comment.comment }}</p>
+                        <p class="comment-user">{{ comment.user }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
     </div>
 {% endblock %}
