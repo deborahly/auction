@@ -12,7 +12,7 @@
             </div>
 
             <div class="col-4 col-price">
-                <p><span style="font-weight: bold">Current Price: </span><span style="font-size: 25px">{{ listing.starting_bid | intcomma }}</span></p>
+                <p><span style="font-weight: bold">Current Price: </span><span style="font-size: 25px">{{ last_bid | intcomma }}</span></p>
             </div>
         </div>
 
@@ -28,15 +28,20 @@
 
         <div class="row listing-row-3">
             <div class="col">
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and auction.user != user%}
                     {% if not watched %}
                         <form action="{% url 'watchlist' %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="listing" value="{{ listing.title }}">
-                            <button type="submit" class="btn btn-secondary">Add to Watchlist</button>
+                            <button type="submit" name="watching" value="add" class="btn btn-secondary">Add to Watchlist</button>
                         </form>
                     {% else %}
                         <p>WATCHING</p>
+                        <form action="{% url 'watchlist' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing" value="{{ listing.title }}">
+                            <button type="submit" name="watching" value="remove" class="btn btn-secondary">Remove from Watchlist</button>
+                        </form>
                     {% endif %}
                 {% endif %}
             </div>
@@ -67,7 +72,7 @@
 
         <img class="image" id="listing-img" src="{{ listing.image.url }}" alt="image">
 
-        <section>
+        <section id="comments-section">
             <div class="row listing-row-comment-title">
                 <div class="col">
                     <h3>Comments</h3>

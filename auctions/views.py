@@ -78,15 +78,31 @@ def categories(request):
 # NEW VIEW
 def watchlist(request):
     if request.method == "POST":
+        
         form = request.POST
-        title = Listing.objects.get(title=form["listing"])
-        w = Watched(user=request.user, title=title)
-        w.save()
+        
+        if form["watching"] == "add":    
+            title = Listing.objects.get(title=form["listing"])
+            w = Watched(user=request.user, title=title)
+            w.save()
 
-        return render(request, "auctions/watchlist.html", {
-            "watched": Watched.objects.filter(user=request.user)
-        })
-    
+            return HttpResponseRedirect(reverse("listing", args=(title,)))
+
+            # return render(request, "auctions/watchlist.html", {
+            #     "watched": Watched.objects.filter(user=request.user)
+            # })
+
+        elif form["watching"] == "remove":  
+            title = Listing.objects.get(title=form["listing"])
+            user = User.objects.get(username=request.user)
+            w = Watched.objects.get(user=user, title=title)
+            w.delete()
+
+            return HttpResponseRedirect(reverse("listing", args=(title,)))
+            # return render(request, "auctions/watchlist.html", {
+            #     "watched": Watched.objects.filter(user=request.user)
+            # })
+
     else:
         return render(request, "auctions/watchlist.html", {
             "watched": Watched.objects.filter(user=request.user)
@@ -110,7 +126,12 @@ def create_listing(request):
 def listing(request, title):
     listing = Listing.objects.get(title=title)
     listing_id = listing.id
+    
     comments = Comment.objects.filter(title=listing_id)
+    
+    bids = Bid.objects.filter(title=listing_id)
+    last_bid = bids.last()
+    
     auction = Auction.objects.get(title=listing_id)
 
     # FORMS
@@ -123,6 +144,7 @@ def listing(request, title):
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
+            "last_bid": last_bid,
             "auction": auction,
             "bid_form": bid_form
         })
@@ -131,6 +153,7 @@ def listing(request, title):
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
+            "last_bid": last_bid,
             "auction": auction,
             "watched": watched,
             "bid_form": bid_form
@@ -151,17 +174,25 @@ def bids(request):
             new_bid = bid_form.cleaned_data["bid"]
         
         bids = Bid.objects.filter(title=listing_id)
-        last_bid = Bid.objects.all().last().bid
+        last_bid = bids.last()
         
-        if new_bid > last_bid:
+        if last_bid and new_bid > last_bid.bid:
             user = User.objects.get(username=request.user)
             b = Bid(bid=new_bid, title=listing, user=user)
             b.save()
+            
             return HttpResponseRedirect(reverse("listing", args=(title,)))
     
+        elif not last_bid and new_bid >= listing.starting_bid:
+            user = User.objects.get(username=request.user)
+            b = Bid(bid=new_bid, title=listing, user=user)
+            b.save()
+
+            return HttpResponseRedirect(reverse("listing", args=(title,)))
+
         else:
             return HttpResponseRedirect(reverse("error"))
 
 # NEW VIEW
 def error(request):
-    pass
+    return render(request, "auctions/error.html")
