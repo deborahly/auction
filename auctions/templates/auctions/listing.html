@@ -12,7 +12,7 @@
             </div>
 
             <div class="col-4 col-price">
-                <p><span style="font-weight: bold">Current Price: </span><span style="font-size: 25px">{{ last_bid | intcomma }}</span></p>
+                <p><span style="font-weight: bold">Current Price: </span><span style="font-size: 25px">{{ listing.current_price | intcomma }}</span></p>
             </div>
         </div>
 
@@ -28,20 +28,22 @@
 
         <div class="row listing-row-3">
             <div class="col">
-                {% if user.is_authenticated and auction.user != user%}
-                    {% if not watched %}
-                        <form action="{% url 'watchlist' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="listing" value="{{ listing.title }}">
-                            <button type="submit" name="watching" value="add" class="btn btn-secondary">Add to Watchlist</button>
-                        </form>
-                    {% else %}
-                        <p>WATCHING</p>
-                        <form action="{% url 'watchlist' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="listing" value="{{ listing.title }}">
-                            <button type="submit" name="watching" value="remove" class="btn btn-secondary">Remove from Watchlist</button>
-                        </form>
+                {% if user.is_authenticated %} 
+                    {% if auction.user != user and auction.status == "ACTIVE" %}
+                        {% if not watched %}
+                            <form action="{% url 'watchlist' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="listing" value="{{ listing.title }}">
+                                <button type="submit" name="watching" value="add" class="btn btn-secondary">Add to Watchlist</button>
+                            </form>
+                        {% else %}
+                            <p>WATCHING</p>
+                            <form action="{% url 'watchlist' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="listing" value="{{ listing.title }}">
+                                <button type="submit" name="watching" value="remove" class="btn btn-secondary">Remove from Watchlist</button>
+                            </form>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </div>
@@ -55,13 +57,16 @@
                             {{ bid_form.as_p }}
 
                             <input type="hidden" name="title" value="{{ listing.title }}">
+                            
                             <button type="submit" class="btn btn-secondary">Make Offer</button>
                         </form>
                     {% elif auction.user == user and auction.status == "ACTIVE" %}
-                        <form action="{% url 'listing' listing.title %}" method="post">
+                        <form action="{% url 'close' listing.id listing.title %}" method="post">
+                            {% csrf_token %}
+
                             <button type="submit" class="btn btn-secondary">Close auction</button>
                         </form>
-                    {% elif auction.user != user and auction.status == "SOLD" and auction.winner == request.user %}
+                    {% elif auction.user != user and auction.status == "CLOSED" and auction.winner == request.user %}
                         <p>Auction closed - You won this auction</p>
                     {% else %}
                         <p>Auction closed</p>

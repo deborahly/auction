@@ -5,10 +5,10 @@
 {% block body %}
     <div class="container">
         <div class="row index-row-title">
-            <h2>Active Listings</h2>
+            <h2>Closed Listings</h2>
         </div>
 
-        {% for listing in active_listings %}
+        {% for listing in closed_listings %}
             <div class="row index-row-item-title">
                 <h5>{{ listing.title }}</h5>
             </div>
@@ -25,7 +25,12 @@
                         </div>
 
                         <div class="col-3 col-int">
-                            <p class="current-price">Current price: {{ listing.current_price | intcomma }}</p>
+                            {% if listing.current_price != listing.starting_bid %}
+                                <p class="current-price">Closed price: {{ listing.current_price | intcomma }}</p>
+                            
+                            {% else %}
+                                <p class="current-price">Auction closed without offers</p>
+                            {% endif %}
                         </div>
                         
                         <div class="col-3 col-int">

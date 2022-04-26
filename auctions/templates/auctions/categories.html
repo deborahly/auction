@@ -3,7 +3,17 @@
 {% block title %}Categories{% endblock %}
 
 {% block body %}
+    <div class="container">
+        <div class="row index-row-title">
+            <h2>Categories</h2>
+        </div>
 
-
-
+        <ul>
+            {% for category in categories %}
+                <li>
+                    <a href="{% url 'category' category %}">{{ category }}</a>  
+                </li>
+            {% endfor %}    
+        </ul>
+    </div>
 {% endblock %}

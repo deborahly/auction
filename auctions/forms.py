@@ -7,7 +7,10 @@ class ListingForm(forms.ModelForm):
 
     class Meta:
         model = Listing
-        fields = ("title", "description", "starting_bid", "category", "image")
+        fields = ("title", "description", "starting_bid", "current_price", "category", "image")
+        widgets = {
+            "current_price": HiddenInput
+        }
 
 class BidForm(forms.ModelForm):
 
