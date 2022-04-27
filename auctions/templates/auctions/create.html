@@ -2,13 +2,23 @@
 
 {% block title %}Create Listing{% endblock %}
 
-{% block body %}
-    {{ message }}
-    <form action="{% url 'create' %}", method="post", enctype="multipart/form-data">
-        {% csrf_token %}
+{% block main %}
+    <div class="container">
+        <div class="row md-pad">
+            <h2>Create Listing</h2>
+        </div>
 
-        {{ form.as_p }}
+        {% if message %}
+            <div>{{ message }}</div>
+        {% endif %}
+    
+        <form action="{% url 'create' %}", method="post", enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <button type="submit">Create</button>
-    </form>
+            {{ form.as_p }}
+
+            <button class="btn btn-secondary" type="submit">Create</button>
+        </form>
+    </div>
+    
 {% endblock %}

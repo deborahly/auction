@@ -2,37 +2,41 @@
 
 {% load humanize %}
 
-{% block body %}
+{% block main %}
     <div class="container">
-        <div class="row index-row-title">
+        <div class="row md-pad">
             <h2>Active Listings</h2>
         </div>
 
         {% for listing in active_listings %}
-            <div class="row index-row-item-title">
-                <h5>{{ listing.title }}</h5>
-            </div>
-
-            <div class="row index-row-content">
-                <div class="col-3 col-img">
-                    <img class="image" id="index-img" src="media/{{ listing.image }}">
+            <div class="border md-pad">
+                <div class="row a-i-center">
+                    <div class="col">
+                        <h5>{{ listing.title }}</h5>
+                    </div>
                 </div>
 
-                <div class="col-9 col-txt">
-                    <div class="row">
-                        <div class="col-6 col-int">
-                            <p class="description">{{ listing.description }}</p>
-                        </div>
+                <div class="row a-i-center t-a-center">
+                    <div class="col-3">
+                        <img class="image" id="index-img" src="media/{{ listing.image }}">
+                    </div>
 
-                        <div class="col-3 col-int">
-                            <p class="current-price">Current price: {{ listing.current_price | intcomma }}</p>
-                        </div>
-                        
-                        <div class="col-3 col-int">
-                            <a href="{% url 'listing' listing.title %}" class="btn btn-secondary">View listing</a>
-                        </div>
-                    </div>   
-                </div>  
+                    <div class="col-9">
+                        <div class="row a-i-center">
+                            <div class="col-6">
+                                {{ listing.description }}
+                            </div>
+
+                            <div class="col-3">
+                                <p class="current-price">Current price: {{ listing.current_price | intcomma }}</p>
+                            </div>
+                            
+                            <div class="col-3">
+                                <a href="{% url 'listing' listing.title %}" class="btn btn-secondary">View listing</a>
+                            </div>
+                        </div>   
+                    </div>  
+                </div>       
             </div>
         {% endfor %}
     </div>

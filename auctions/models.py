@@ -1,3 +1,4 @@
+from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -47,16 +48,25 @@ class Watched(models.Model):
 class Bid(models.Model):
     id = models.AutoField(primary_key=True)
     bid = models.DecimalField(max_digits=10, decimal_places=2, default="")
-    title = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=True, default="")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, default="")
-    
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_on"]
+
     def __str__(self):
         return f"{self.bid}"
 
 class Comment(models.Model):
-    comment = models.CharField(max_length=500, default="")
-    title = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-created_on"]
     
     def __str__(self):
-        return f"{self.comment}"
+        return "Comment {} by {}".format(self.body, self.user)

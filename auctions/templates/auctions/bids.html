@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% load humanize %}
+
+{% block main %}
+    <div class="container">
+        <div class="row md-pad-t-b">
+            <h2>My Bids</h2>
+        </div>
+
+        <div class="row">
+            <ul>
+                {% for bid in bids %}
+                    <li>{{ bid.listing }} - {{ bid.bid | intcomma }} - {{ bid.created_on}}</li>
+                
+                {% empty %}
+                    <p>No bids yet</p>
+
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

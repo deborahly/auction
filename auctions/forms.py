@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm, NumberInput, HiddenInput
-from .models import Listing, Bid
+from .models import Listing, Bid, Comment
 
 
 class ListingForm(forms.ModelForm):
@@ -20,3 +20,9 @@ class BidForm(forms.ModelForm):
         widgets = {
             "bid": NumberInput
         }
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ("body",)

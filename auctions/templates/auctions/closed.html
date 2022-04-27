@@ -2,34 +2,38 @@
 
 {% load humanize %}
 
-{% block body %}
+{% block main %}
     <div class="container">
-        <div class="row index-row-title">
+        <div class="row md-pad">
             <h2>Closed Listings</h2>
         </div>
 
         {% for listing in closed_listings %}
-            <div class="row index-row-item-title">
-                <h5>{{ listing.title }}</h5>
-            </div>
+            <div class="border md-pad">
+                <div class="row a-i-center">
+                    <div class="col">
+                        <h5>{{ listing.title }}</h5>
+                    </div>
+                </div>
 
-            <div class="row index-row-content">
-                <div class="col-3 col-img">
+            <div class="row a-i-center t-a-center">
+                <div class="col-3">
                     <img class="image" id="index-img" src="media/{{ listing.image }}">
                 </div>
 
-                <div class="col-9 col-txt">
-                    <div class="row">
-                        <div class="col-6 col-int">
-                            <p class="description">{{ listing.description }}</p>
+                <div class="col-9">
+                    <div class="row a-i-center">
+                        <div class="col-6">
+                            <p>{{ listing.description }}</p>
                         </div>
 
-                        <div class="col-3 col-int">
+                        <div class="col-3">
                             {% if listing.current_price != listing.starting_bid %}
                                 <p class="current-price">Closed price: {{ listing.current_price | intcomma }}</p>
                             
                             {% else %}
                                 <p class="current-price">Auction closed without offers</p>
+                            
                             {% endif %}
                         </div>
                         
