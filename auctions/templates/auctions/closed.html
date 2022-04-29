@@ -9,40 +9,45 @@
         </div>
 
         {% for listing in closed_listings %}
-            <div class="border md-pad">
-                <div class="row a-i-center">
+            <div class="border sm-pad sm-mar-t-b">
+                <div class="row a-i-center sm-pad">
                     <div class="col">
                         <h5>{{ listing.title }}</h5>
                     </div>
                 </div>
 
-            <div class="row a-i-center t-a-center">
-                <div class="col-3">
-                    <img class="image" id="index-img" src="media/{{ listing.image }}">
+                <div class="row a-i-center t-a-center">
+                    <div class="col-3">
+                        <img class="image" id="index-img" src="media/{{ listing.image }}">
+                    </div>
+
+                    <div class="col-9">
+                        <div class="row a-i-center">
+                            <div class="col-6 o-h">
+                                <p>{{ listing.description }}</p>
+                            </div>
+
+                            <div class="col-3">
+                                {% if listing.current_price != listing.starting_bid %}
+                                    <p class="current-price">Closed price: <span style="font-size: 20px">{{ listing.current_price | intcomma }}</span></p>
+                                
+                                {% else %}
+                                    <p class="current-price">Auction closed without offers</p>
+                                
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-3 col-int">
+                                <a href="{% url 'listing' listing.title %}" class="btn btn-secondary">View listing</a>
+                            </div>
+                        </div>   
+                    </div>  
                 </div>
-
-                <div class="col-9">
-                    <div class="row a-i-center">
-                        <div class="col-6">
-                            <p>{{ listing.description }}</p>
-                        </div>
-
-                        <div class="col-3">
-                            {% if listing.current_price != listing.starting_bid %}
-                                <p class="current-price">Closed price: {{ listing.current_price | intcomma }}</p>
-                            
-                            {% else %}
-                                <p class="current-price">Auction closed without offers</p>
-                            
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-3 col-int">
-                            <a href="{% url 'listing' listing.title %}" class="btn btn-secondary">View listing</a>
-                        </div>
-                    </div>   
-                </div>  
             </div>
+        
+        {% empty %}
+            <h5>No closed listing yet</h5>
+        
         {% endfor %}
     </div>
 {% endblock %}

@@ -2,6 +2,8 @@
 
 {% load humanize %}
 
+{% block title %}Index{% endblock %}
+
 {% block main %}
     <div class="container">
         <div class="row md-pad">
@@ -9,8 +11,8 @@
         </div>
 
         {% for listing in active_listings %}
-            <div class="border md-pad">
-                <div class="row a-i-center">
+            <div class="border sm-pad sm-mar-t-b">
+                <div class="row a-i-center sm-pad">
                     <div class="col">
                         <h5>{{ listing.title }}</h5>
                     </div>
@@ -23,12 +25,12 @@
 
                     <div class="col-9">
                         <div class="row a-i-center">
-                            <div class="col-6">
+                            <div class="col-6 o-h">
                                 {{ listing.description }}
                             </div>
 
                             <div class="col-3">
-                                <p class="current-price">Current price: {{ listing.current_price | intcomma }}</p>
+                                <p class="current-price">Current price: <span style="font-size: 20px">{{ listing.current_price | intcomma }}</span></p>
                             </div>
                             
                             <div class="col-3">
@@ -38,6 +40,10 @@
                     </div>  
                 </div>       
             </div>
+        
+        {% empty %}
+            <h5>No active listing currently</h5>
+        
         {% endfor %}
     </div>
 {% endblock %}

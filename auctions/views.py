@@ -1,7 +1,6 @@
 from ast import operator
 from operator import methodcaller
 from typing import List
-# from turtle import title
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -10,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 
-from .models import User, Listing, Watched, Bid, Comment, Auction
+from .models import User, Listing, Watching, Bid, Comment, Auction
 from .forms import CommentForm, ListingForm, BidForm
 
 import operator
@@ -30,7 +29,6 @@ def index(request):
         "active_listings": active_listings
     })
 
-# NEW VIEW
 def closed(request):
     listings = Listing.objects.all()
     closed_listings = []
@@ -92,24 +90,28 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-# NEW VIEW
 def categories(request):
-    categories = Listing.objects.values_list("category", flat=True).distinct()
+    categories = Listing.objects.values_list("category", flat=True).distinct().order_by()
 
     return render(request, "auctions/categories.html", {
         "categories": categories
     })
 
-#NEW VIEW
 def category(request,category):
     category_listings = Listing.objects.filter(category=category)
-
+    active_category_listings = []
+    
+    for listing in category_listings:
+        auction = listing.auction_set.get()
+        
+        if auction.status == "ACTIVE":
+            active_category_listings.append(listing)
+    
     return render(request, "auctions/category.html", {
-        "category_listings": category_listings,
+        "active_category_listings": active_category_listings,
         "category": category
     })
 
-# NEW VIEW
 @login_required
 def watchlist(request):
     if request.method == "POST":
@@ -117,26 +119,25 @@ def watchlist(request):
         form = request.POST
         
         if form["watching"] == "add":    
-            title = Listing.objects.get(title=form["listing"])
-            w = Watched(user=request.user, title=title)
+            listing = Listing.objects.get(title=form["listing"])
+            w = Watching(user=request.user, listing=listing)
             w.save()
 
-            return HttpResponseRedirect(reverse("listing", args=(title,)))
+            return HttpResponseRedirect(reverse("listing", args=(listing.title,)))
 
         elif form["watching"] == "remove":  
-            title = Listing.objects.get(title=form["listing"])
+            listing = Listing.objects.get(title=form["listing"])
             user = User.objects.get(username=request.user)
-            w = Watched.objects.get(user=user, title=title)
+            w = Watching.objects.get(user=user, listing=listing)
             w.delete()
 
-            return HttpResponseRedirect(reverse("listing", args=(title,)))
+            return HttpResponseRedirect(reverse("listing", args=(listing.title,)))
 
     else:
         return render(request, "auctions/watchlist.html", {
-            "watched": Watched.objects.filter(user=request.user)
+            "watchings": Watching.objects.filter(user=request.user)
         })
 
-# NEW VIEW
 @login_required
 def create(request):
     if request.method == "POST":
@@ -151,7 +152,7 @@ def create(request):
 
             user = User.objects.get(username=request.user)
 
-            auction = Auction(user=user, title=listing)
+            auction = Auction(user=user, listing=listing)
             auction.save()
 
             return HttpResponseRedirect(reverse("index"))
@@ -162,31 +163,24 @@ def create(request):
         "form": form
         })
 
-# NEW VIEW
 def listing(request, title):
     listing = Listing.objects.get(title=title)
     listing_id = listing.id
     
-    # comments = Comment.objects.filter(listing=listing_id)
     comments = listing.comments.filter(active=True)
     
-    # bids = Bid.objects.filter(title=listing_id)
-    # last_bid = bids.last()
-    
-    auction = Auction.objects.get(title=listing_id)
+    auction = Auction.objects.get(listing=listing_id)
 
-    # FORMS
-    bid_form = BidForm(initial={"title": listing_id})
+    bid_form = BidForm
     comment_form = CommentForm
     
     try:
-        watched = Watched.objects.get(user=request.user, title=listing_id)
+        watching = Watching.objects.get(user=request.user, listing=listing_id)
                
     except:
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
-            # "last_bid": last_bid,
             "auction": auction,
             "bid_form": bid_form,
             "comment_form": comment_form
@@ -196,14 +190,12 @@ def listing(request, title):
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
-            # "last_bid": last_bid,
             "auction": auction,
-            "watched": watched,
+            "watching": watching,
             "bid_form": bid_form,
             "comment_form": comment_form
         })
 
-# NEW VIEW
 @login_required
 def bids(request):
     if request.method == "POST":
@@ -219,7 +211,7 @@ def bids(request):
             new_bid = bid_form.cleaned_data["bid"]
         
             bids = Bid.objects.filter(listing=listing_id)
-            last_bid = bids.last()
+            last_bid = bids.first()
         
             if (last_bid and new_bid > last_bid.bid) or (not last_bid and new_bid >= listing.starting_bid):
                 user = User.objects.get(username=request.user)
@@ -229,7 +221,7 @@ def bids(request):
                 listing.current_price = new_bid
                 listing.save()
 
-                return HttpResponseRedirect(reverse("listing", args=(title,)))
+                return HttpResponseRedirect(reverse("listing", args=(listing.title,)))
         
             else:
                 return HttpResponseRedirect(reverse("error"))
@@ -242,16 +234,15 @@ def bids(request):
             "bids": Bid.objects.filter(user=request.user)
         })
 
-# NEW VIEW
 @login_required
 def close(request, id, title):
     if request.method == "POST":
-        auction = Auction.objects.get(title=id)
+        auction = Auction.objects.get(listing=id)
         auction.status = "CLOSED"
 
-        Watched.objects.filter(title=id).delete()
+        Watching.objects.filter(listing=id).delete()
         
-        bids = Bid.objects.filter(title=id)
+        bids = Bid.objects.filter(listing=id)
         last_bid = bids.last()
         
         if last_bid == None:
@@ -265,7 +256,6 @@ def close(request, id, title):
 
             return HttpResponseRedirect(reverse("listing", args=(title,)))
 
-# NEW VIEW
 @login_required
 def comments(request, title):
     if request.method == "POST":
@@ -288,6 +278,5 @@ def comments(request, title):
         else:
             return HttpResponseRedirect(reverse("error"))
 
-# NEW VIEW
 def error(request):
     return render(request, "auctions/error.html")

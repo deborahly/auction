@@ -1,6 +1,13 @@
 /* Elements */
-header {
+body {
     padding-top: 0rem;
+    padding-bottom: 5rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
+header {
+    padding-top: 1rem;
     padding-bottom: 2rem;
     padding-left: 0rem;
     padding-right: 0rem;
@@ -55,7 +62,8 @@ a:hover {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
+    height: 12rem;
+    width: auto;
 }
 
 #listing-img {
@@ -158,3 +166,7 @@ a:hover {
     font-size: small;
 }
 
+/* Overflow */
+.o-h {
+    overflow: hidden;
+}

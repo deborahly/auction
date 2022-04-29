@@ -4,17 +4,19 @@
 
 {% block main %}
     <div class="container">
-        <div class="row index-row-title">
+        <div class="row md-pad">
             <h2>My Watchlist</h2>
         </div>
 
         <ul>
-            {% for listing in watched %}
+            {% for watching in watchings %}
                 <li>
-                    <a href="{% url 'listing' listing.title %}">{{ listing.title }}</a>  
+                    <a href="{% url 'listing' watching.listing %}">{{ watching.listing }}</a>  
                 </li>
+            
             {% empty %}
                 <h5>No listing being watched</h5>
+            
             {% endfor %}    
         </ul>
     </div>

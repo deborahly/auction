@@ -18,7 +18,7 @@
             </div>
     
             <div class="row sm-pad-t-b a-i-end">
-                <div class="col-8">
+                <div class="col-8 o-h">
                     <p>{{ listing.description }}</p>
                 </div>
     
@@ -31,7 +31,7 @@
                 <div class="col">
                     {% if user.is_authenticated %} 
                         {% if auction.user != user and auction.status == "ACTIVE" %}
-                            {% if not watched %}
+                            {% if not watching %}
                                 <form action="{% url 'watchlist' %}" method="post">
                                     {% csrf_token %}
                                     
@@ -128,7 +128,7 @@
             {% empty %}
                 <div class="row sm-pad-t-b">
                     <div class="col">
-                        <h5>No comments</h5>
+                        <h5>No comments yet</h5>
                     </div>
                 </div>
             {% endfor %}
