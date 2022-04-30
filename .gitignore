@@ -1,6 +1,5 @@
 *.pyc
 **/__pycache__/
-**/__init__.py
 .vscode
 migrations
 venv
