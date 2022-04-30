@@ -4,7 +4,7 @@ from typing import List
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
@@ -13,6 +13,21 @@ from .models import User, Listing, Watching, Bid, Comment, Auction
 from .forms import CommentForm, ListingForm, BidForm
 
 import operator
+
+
+ERROR_INVALID_BID_AMOUNT = 1
+ERROR_INVALID_COMMENT = 2
+ERROR_INVALID_BID_FORMAT = 3
+ERROR_INVALID_LISTING_FORMAT = 4
+ERROR_NEGATIVE_AMOUNT = 5
+
+ERROR_DICT = {
+    ERROR_INVALID_BID_AMOUNT: {"message": "Bid must be equal or greater than the starting bid and greater than the current price.", "status": 400},
+    ERROR_INVALID_COMMENT: {"message": "Invalid comment.", "status": 400},
+    ERROR_INVALID_BID_FORMAT: {"message": "Must be a decimal number.", "status": 400},
+    ERROR_INVALID_LISTING_FORMAT: {"message": "Incorrect data input for creating a new listing.", "status": 400},
+    ERROR_NEGATIVE_AMOUNT: {"message": "Starting bid must be a positive number.", "status": 400}
+}
 
 
 def index(request):
@@ -97,8 +112,13 @@ def categories(request):
         "categories": categories
     })
 
-def category(request,category):
+def category(request, category):
+
     category_listings = Listing.objects.filter(category=category)
+    
+    if len(category_listings) == 0:
+        raise Http404
+
     active_category_listings = []
     
     for listing in category_listings:
@@ -144,6 +164,10 @@ def create(request):
         form = ListingForm(request.POST, request.FILES)
         
         if form.is_valid():
+            
+            if form.cleaned_data["starting_bid"] <= 0:
+                return HttpResponseRedirect(reverse("error", args=(ERROR_NEGATIVE_AMOUNT,)))
+            
             title = form.cleaned_data["title"]
             form.instance.current_price = form.cleaned_data["starting_bid"]
             form.save()
@@ -156,15 +180,23 @@ def create(request):
             auction.save()
 
             return HttpResponseRedirect(reverse("index"))
+
+        else:
+            return HttpResponseRedirect(reverse("error", args=(ERROR_INVALID_LISTING_FORMAT,)))
             
     else:
         form = ListingForm
-        return render(request, "auctions/create.html", {
-        "form": form
+        return render(request, "auctions/create.html", { 
+            "form": form
         })
 
 def listing(request, title):
-    listing = Listing.objects.get(title=title)
+    try:
+        listing = Listing.objects.get(title=title)
+
+    except:
+        raise Http404
+
     listing_id = listing.id
     
     comments = listing.comments.filter(active=True)
@@ -222,12 +254,10 @@ def bids(request):
                 listing.save()
 
                 return HttpResponseRedirect(reverse("listing", args=(listing.title,)))
-        
             else:
-                return HttpResponseRedirect(reverse("error"))
-        
+                return HttpResponseRedirect(reverse("error", args=(ERROR_INVALID_BID_AMOUNT,)))
         else:
-            return HttpResponseRedirect(reverse("error"))
+            return HttpResponseRedirect(reverse("error",  args=(ERROR_INVALID_BID_FORMAT,)))
 
     if request.method == "GET":
         return render(request, "auctions/bids.html", {
@@ -276,7 +306,12 @@ def comments(request, title):
             return HttpResponseRedirect(reverse("listing", args=(title,)))
         
         else:
-            return HttpResponseRedirect(reverse("error"))
+            return HttpResponseRedirect(reverse("error", args=(ERROR_INVALID_COMMENT,)))
 
-def error(request):
-    return render(request, "auctions/error.html")
+def error(request, code):
+
+    context = {
+        "message": ERROR_DICT[code]["message"]
+    }
+
+    return render(request, "auctions/error.html", status=ERROR_DICT[code]["status"], context=context)
